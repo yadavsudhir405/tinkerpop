@@ -18,8 +18,13 @@
  */
 package org.apache.tinkerpop.gremlin.tinkergraph.structure;
 
+import org.apache.commons.configuration.MapConfiguration;
 import org.apache.tinkerpop.gremlin.process.computer.Computer;
+import org.apache.tinkerpop.gremlin.process.computer.GraphComputer;
+import org.apache.tinkerpop.gremlin.process.computer.traversal.strategy.decoration.VertexProgramStrategy;
 import org.apache.tinkerpop.gremlin.process.traversal.Operator;
+import org.apache.tinkerpop.gremlin.process.traversal.Order;
+import org.apache.tinkerpop.gremlin.process.traversal.Scope;
 import org.apache.tinkerpop.gremlin.process.traversal.Traversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversalSource;
@@ -29,6 +34,7 @@ import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.T;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLIo;
+import org.apache.tinkerpop.gremlin.tinkergraph.process.computer.TinkerGraphComputer;
 import org.apache.tinkerpop.gremlin.util.TimeUtil;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
@@ -131,12 +138,18 @@ public class TinkerGraphPlayTest {
     @Ignore
     public void testPlayDK() throws Exception {
 
-        Graph graph = TinkerGraph.open();
-        GraphTraversalSource g = graph.traversal();
-        graph.io(GraphMLIo.build()).readGraph("/projects/apache/tinkerpop/data/grateful-dead.xml");
-        System.out.println(g.V().filter(outE("sungBy").count().is(0)).explain());
-        System.out.println(g.V().filter(outE("sungBy").count().is(lt(1))).explain());
-        System.out.println(g.V().filter(outE("sungBy").count().is(1)).explain());
+        Graph graph = TinkerFactory.createModern();
+        //GraphTraversalSource g = graph.traversal().withComputer();
+        GraphTraversalSource g = graph.traversal().withStrategies(VertexProgramStrategy.create(new MapConfiguration(new HashMap<String, Object>() {{
+            put(VertexProgramStrategy.WORKERS, 1);
+            put(VertexProgramStrategy.GRAPH_COMPUTER,
+                    //GraphComputer.class.getCanonicalName() :
+                    TinkerGraphComputer.class.getCanonicalName());
+        }})));
+
+        g.V().map(__.bothE().values("weight").fold()).order().by(__.sum(Scope.local), Order.decr).
+        //g.V().local(__.bothE().values("weight").fold().sum(Scope.local)).order().by(Order.decr).
+                forEachRemaining(System.out::println);
     }
 
     @Test

@@ -134,7 +134,6 @@ Feature: Step - union()
       | result |
       | d[3].l   |
       | d[0].l   |
-      | d[1.9].d |
       | d[0].i   |
-      | d[0].l   |
+      | d[1.9].d |
       | d[1].l   |

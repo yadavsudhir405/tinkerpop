@@ -71,7 +71,9 @@ public final class OrderGlobalStep<S, C extends Comparable> extends CollectingBa
     @Override
     public void processAllStarts() {
         while (this.starts.hasNext()) {
-            this.traverserSet.add(this.createProjectedTraverser(this.starts.next()));
+            final Traverser.Admin<S> traverser = this.starts.next();
+            if (traverser.get() != null)
+            this.traverserSet.add(this.createProjectedTraverser(traverser));
         }
     }
 
