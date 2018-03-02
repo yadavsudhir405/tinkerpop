@@ -25,6 +25,7 @@ NEED AND IMAGE
 
 This release also includes changes from <<release-3-3-2, 3.3.2>>.
 
+* Bumped to support Giraph 1.2.0.
 
 == TinkerPop 3.3.0 (Gremlin Symphony #40 in G Minor)
 
