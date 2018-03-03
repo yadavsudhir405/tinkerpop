@@ -28,3 +28,8 @@ NEED AN IMAGE
 Please see the link:https://github.com/apache/tinkerpop/blob/3.4.0/CHANGELOG.asciidoc#release-3-4-0[changelog] for a complete list of all the modifications that are part of this release.
 
 === Upgrading for Users
+
+==== Change in order of select() scopes
+
+The order of select scopes has been changed to: maps, side-effects, paths
+Previously the order was: side-effects, maps, paths - which made it almost impossible to select a specific map entry if a side-effect with the same name existed.
